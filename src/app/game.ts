@@ -67,6 +67,7 @@ export class Momo {
 }
 
 export function renderer(state: Momo) {
+  // This only needs to be called once, and not get called every time
   const world = <HTMLCanvasElement>document.getElementById("world-canvas");
   const ctx = world.getContext("2d");
 
