@@ -71,6 +71,7 @@ export function renderer(state: Momo) {
   const world = <HTMLCanvasElement>document.getElementById("world-canvas");
   const ctx = world.getContext("2d");
 
+  // This should be separate from the renderer function
   ctx.rect(0, 0, 1280, 720);
   ctx.fillStyle = "white";
   ctx.fill();
