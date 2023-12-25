@@ -1,87 +1,63 @@
-import momoImgSrc from "../assets/images/momo.png";
+import { Momo } from "./momo-class";
 
-// has ViewModel that renders the game state to the screen
-// has GameLogic that "advances" the GameState
-class World {
-  private state: any;
-  private stateUpdater: Function;
-  private stateRenderer: Function;
+// Declare canvas, context variables
+let canvas: HTMLCanvasElement;
+let context: CanvasRenderingContext2D;
 
-  constructor(state: any, updaterFunc: Function, rendererFunc: Function) {
-    this.state = state;
-    this.stateUpdater = updaterFunc;
-    this.stateRenderer = rendererFunc;
+// Instantiate momo
+let momo = new Momo();
 
-    window.onload = this.initializeWorld;
-  }
+export function world() {
+  canvas = <HTMLCanvasElement>document.getElementById("world-canvas");
+  context = canvas.getContext("2d");
 
-  private initializeWorld() {
-    window.requestAnimationFrame(this.worldLoop);
-  }
-
-  private worldLoop() {
-    this.update();
-    this.render();
-  }
-
-  private update(): void {
-    this.stateUpdater(this.state);
-  }
-
-  private render(): void {
-    let currentState = this.state.getCurrentState();
-    this.stateRenderer(currentState);
-  }
+  // Start the first frame request
+  window.requestAnimationFrame(worldLoop);
 }
 
-export class Momo {
-  private momo: HTMLImageElement;
-  private xPos: number;
-  private yPos: number;
+function worldLoop() {
+  render(momo);
+  updater(momo);
 
-  constructor() {
-    this.momo = new Image();
-    this.momo.src = momoImgSrc;
-    this.xPos = 0;
-    this.yPos = 285;
-  }
-
-  public setXPos(deltaX: number) {
-    this.xPos = this.xPos + deltaX;
-  }
-  public setYPos(deltaY: number) {
-    this.yPos = this.yPos + deltaY;
-  }
-
-  public getXpos(): number {
-    return this.xPos;
-  }
-
-  public getYpos(): number {
-    return this.yPos;
-  }
-
-  public getImageObj(): HTMLImageElement {
-    return this.momo;
-  }
+  // Keep requesting new frames
+  window.requestAnimationFrame(worldLoop);
 }
 
-export function renderer(state: Momo) {
-  // This only needs to be called once, and not get called every time
-  const world = <HTMLCanvasElement>document.getElementById("world-canvas");
-  const ctx = world.getContext("2d");
-
-  // This should be separate from the renderer function
-  ctx.rect(0, 0, 1280, 720);
-  ctx.fillStyle = "white";
-  ctx.fill();
-
+function render(state: Momo) {
   let momoCurrentXPos = state.getXpos();
   let momoCurrentYPos = state.getYpos();
 
   const momoImageObject = state.getImageObj();
 
-  momoImageObject.onload = () => {
-    ctx.drawImage(momoImageObject, momoCurrentXPos, momoCurrentYPos);
-  };
+  // Clear previous canvas
+  context.clearRect(0, 0, 1280, 720);
+
+  // Renders background
+  context.rect(0, 0, 1280, 720);
+  context.fillStyle = "white";
+  context.fill();
+
+  // Draws the Momo object to the canvas
+  context.drawImage(momoImageObject, momoCurrentXPos, momoCurrentYPos);
+}
+
+function updater(state: Momo): void {
+  const rightEdgeOfTheCanvas = 1280 - 150;
+  const leftEdgeOfTheCanvas = 0;
+  const speed = 5; // any divisor of the value of the rightEdgeOfTheCanvas
+  let currentXPos = state.getXpos();
+
+  if (state.advancingToEast()) {
+    if (currentXPos >= rightEdgeOfTheCanvas) {
+      state.flipAdvancingDirection();
+    } else {
+      state.setXPos(speed);
+    }
+  } else {
+    if (currentXPos <= leftEdgeOfTheCanvas) {
+      state.flipAdvancingDirection();
+    } else {
+      state.setXPos(-speed);
+    }
+  }
 }
