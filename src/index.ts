@@ -1,7 +1,4 @@
 import "./assets/styles/main.css";
+import { world } from "./app/world";
 
-import { renderer } from "./app/game";
-import { Momo } from "./app/game";
-
-let momoDog = new Momo();
-renderer(momoDog);
+window.onload = world;
