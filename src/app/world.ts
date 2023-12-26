@@ -18,6 +18,7 @@ export function world() {
 function worldLoop() {
   render(momo);
   updater(momo);
+  keyHandler(momo);
 
   // Keep requesting new frames
   window.requestAnimationFrame(worldLoop);
@@ -44,20 +45,35 @@ function render(state: Momo) {
 function updater(state: Momo): void {
   const rightEdgeOfTheCanvas = 1280 - 150;
   const leftEdgeOfTheCanvas = 0;
-  const speed = 5; // any divisor of the value of the rightEdgeOfTheCanvas
+  const Speed = 5; // any divisor of the value of the rightEdgeOfTheCanvas
   let currentXPos = state.getXpos();
 
   if (state.advancingToEast()) {
     if (currentXPos >= rightEdgeOfTheCanvas) {
       state.flipAdvancingDirection();
     } else {
-      state.setXPos(speed);
+      state.setXPos(Speed);
     }
   } else {
     if (currentXPos <= leftEdgeOfTheCanvas) {
       state.flipAdvancingDirection();
     } else {
-      state.setXPos(-speed);
+      state.setXPos(-Speed);
     }
   }
+}
+
+function keyHandler(state: Momo) {
+  document.addEventListener(
+    "keydown",
+    (event) => {
+      var name = event.key;
+      if (name === " ") {
+        // Reset the image object position
+        state.resetXPosition();
+        return;
+      }
+    },
+    false
+  );
 }
