@@ -14,6 +14,11 @@ export class Momo {
     this.isAdvancingToEast = true;
   }
 
+  public resetXPosition(): void {
+    this.isAdvancingToEast = true;
+    this.xPos = 0;
+  }
+
   public flipAdvancingDirection() {
     if (this.isAdvancingToEast) {
       this.isAdvancingToEast = false;
