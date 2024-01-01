@@ -4,31 +4,31 @@ export class Momo {
   private momo: HTMLImageElement;
   private xPos: number;
   private yPos: number;
-  private isAdvancingToEast: boolean;
+  private eastbound: boolean;
 
   constructor() {
     this.momo = new Image();
     this.momo.src = momoImgSrc;
     this.xPos = 0;
     this.yPos = 285;
-    this.isAdvancingToEast = true;
+    this.eastbound = true;
   }
 
   public resetXPosition(): void {
-    this.isAdvancingToEast = true;
+    this.eastbound = true;
     this.xPos = 0;
   }
 
   public flipAdvancingDirection() {
-    if (this.isAdvancingToEast) {
-      this.isAdvancingToEast = false;
+    if (this.eastbound) {
+      this.eastbound = false;
     } else {
-      this.isAdvancingToEast = true;
+      this.eastbound = true;
     }
   }
 
-  public advancingToEast(): boolean {
-    return this.isAdvancingToEast;
+  public isEastbound(): boolean {
+    return this.eastbound;
   }
 
   // advanceByDeltaX could be negative or positive

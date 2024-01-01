@@ -43,22 +43,22 @@ function render(state: Momo) {
 }
 
 function updater(state: Momo): void {
-  const rightEdgeOfTheCanvas = 1280 - 150;
-  const leftEdgeOfTheCanvas = 0;
-  const Speed = 5; // any divisor of the value of the rightEdgeOfTheCanvas
+  const RIGHT_EDGE_OF_THE_CANVAS = 1280 - 150;
+  const LEFT_EDGE_OF_THE_CANVAS = 0;
+  const SPEED = 5; // any divisor of the value of the rightEdgeOfTheCanvas
   let currentXPos = state.getXpos();
 
-  if (state.advancingToEast()) {
-    if (currentXPos >= rightEdgeOfTheCanvas) {
+  if (state.isEastbound()) {
+    if (currentXPos >= RIGHT_EDGE_OF_THE_CANVAS) {
       state.flipAdvancingDirection();
     } else {
-      state.setXPos(Speed);
+      state.setXPos(SPEED);
     }
   } else {
-    if (currentXPos <= leftEdgeOfTheCanvas) {
+    if (currentXPos <= LEFT_EDGE_OF_THE_CANVAS) {
       state.flipAdvancingDirection();
     } else {
-      state.setXPos(-Speed);
+      state.setXPos(-SPEED);
     }
   }
 }
