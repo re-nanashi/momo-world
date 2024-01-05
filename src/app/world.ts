@@ -24,7 +24,7 @@ type button = string;
 
 class InputHandler {
   readonly BUTTON_SPACE: button = " ";
-  readonly BUTTON_F: button = "F";
+  readonly BUTTON_F: button = "f";
 
   private _buttonSpace: Command;
   private _buttonF: Command;
@@ -35,11 +35,11 @@ class InputHandler {
     document.addEventListener(
       "keydown",
       (event) => {
-        let buttonPressed = event.key;
+        let buttonStr = event.key;
 
-        if (buttonPressed === this.BUTTON_SPACE) {
+        if (buttonStr === this.BUTTON_SPACE) {
           this._userInput = this.BUTTON_SPACE;
-        } else if (buttonPressed === this.BUTTON_F) {
+        } else if (buttonStr === this.BUTTON_F) {
           this._userInput = this.BUTTON_F;
         } else {
           this._userInput = null;
@@ -50,11 +50,16 @@ class InputHandler {
   }
 
   public handleUserKeyboardInput(): Command {
-    if (this.isButtonPressed(this.BUTTON_SPACE)) return this._buttonSpace;
-    if (this.isButtonPressed(this.BUTTON_F)) return this._buttonF;
+    let ret: Command = null;
+
+    if (this._userInput === this.BUTTON_SPACE) ret = this._buttonSpace;
+    if (this._userInput === this.BUTTON_F) ret = this._buttonF;
+
+    // Remove previous user input.
+    this._userInput = null;
 
     // Nothing pressed, so do nothing.
-    return null;
+    return ret;
   }
 
   public bindSpaceButton(commandToBind: Command): void {
@@ -63,13 +68,6 @@ class InputHandler {
 
   public bindFButton(commandToBind: Command): void {
     this._buttonF = commandToBind;
-  }
-
-  private isButtonPressed(buttonPressed: button) {
-    let ret = buttonPressed == this._userInput ? true : false;
-    this._userInput = null;
-
-    return ret;
   }
 }
 
