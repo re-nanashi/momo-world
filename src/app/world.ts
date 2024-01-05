@@ -4,23 +4,107 @@ import { Momo } from "./momo-class";
 let canvas: HTMLCanvasElement;
 let context: CanvasRenderingContext2D;
 
-// Instantiate momo
+abstract class Command {
+  abstract execute(actor: Momo): void;
+}
+
+class ResetPositionCommand extends Command {
+  execute(actor: Momo): void {
+    actor.resetXPosition();
+  }
+}
+
+class FlipDirectionCommand extends Command {
+  execute(actor: Momo): void {
+    actor.flipAdvancingDirection();
+  }
+}
+
+type button = string;
+
+class InputHandler {
+  readonly BUTTON_SPACE: button = " ";
+  readonly BUTTON_F: button = "F";
+
+  private _buttonSpace: Command;
+  private _buttonF: Command;
+
+  private _userInput: button = null;
+
+  constructor() {
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        let buttonPressed = event.key;
+
+        if (buttonPressed === this.BUTTON_SPACE) {
+          this._userInput = this.BUTTON_SPACE;
+        } else if (buttonPressed === this.BUTTON_F) {
+          this._userInput = this.BUTTON_F;
+        } else {
+          this._userInput = null;
+        }
+      },
+      false
+    );
+  }
+
+  public handleUserKeyboardInput(): Command {
+    if (this.isButtonPressed(this.BUTTON_SPACE)) return this._buttonSpace;
+    if (this.isButtonPressed(this.BUTTON_F)) return this._buttonF;
+
+    // Nothing pressed, so do nothing.
+    return null;
+  }
+
+  public bindSpaceButton(commandToBind: Command): void {
+    this._buttonSpace = commandToBind;
+  }
+
+  public bindFButton(commandToBind: Command): void {
+    this._buttonF = commandToBind;
+  }
+
+  private isButtonPressed(buttonPressed: button) {
+    let ret = buttonPressed == this._userInput ? true : false;
+    this._userInput = null;
+
+    return ret;
+  }
+}
+
+// Instantiate momo, inputHandler.
 let momo = new Momo();
+let inputHandler = new InputHandler();
 
 export function world() {
   canvas = <HTMLCanvasElement>document.getElementById("world-canvas");
   context = canvas.getContext("2d");
 
-  // Start the first frame request
+  // Initialize button events.
+  let spaceButtonCommand = new ResetPositionCommand();
+  let fButtonCommand = new FlipDirectionCommand();
+
+  // Bind button events.
+  inputHandler.bindSpaceButton(spaceButtonCommand);
+  inputHandler.bindFButton(fButtonCommand);
+
+  // Start the first frame request.
   window.requestAnimationFrame(worldLoop);
 }
 
 function worldLoop() {
-  render(momo);
-  updater(momo);
-  keyHandler(momo);
+  // User Keyboard Input Handling.
+  let command: Command = inputHandler.handleUserKeyboardInput();
+  if (command) command.execute(momo);
 
-  // Keep requesting new frames
+  // Render the object's current state.
+  render(momo);
+
+  // Update the object's state.
+  updater(momo);
+
+  // Keep requesting new frames.
   window.requestAnimationFrame(worldLoop);
 }
 
@@ -30,15 +114,15 @@ function render(state: Momo) {
 
   const momoImageObject = state.getImageObj();
 
-  // Clear previous canvas
+  // Clear previous canvas.
   context.clearRect(0, 0, 1280, 720);
 
-  // Renders background
+  // Render white background.
   context.rect(0, 0, 1280, 720);
   context.fillStyle = "white";
   context.fill();
 
-  // Draws the Momo object to the canvas
+  // Draws the Momo object to the canvas.
   context.drawImage(momoImageObject, momoCurrentXPos, momoCurrentYPos);
 }
 
@@ -61,19 +145,4 @@ function updater(state: Momo): void {
       state.setXPos(-SPEED);
     }
   }
-}
-
-function keyHandler(state: Momo) {
-  document.addEventListener(
-    "keydown",
-    (event) => {
-      var name = event.key;
-      if (name === " ") {
-        // Reset the image object position
-        state.resetXPosition();
-        return;
-      }
-    },
-    false
-  );
 }
